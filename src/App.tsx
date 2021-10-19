@@ -2,16 +2,15 @@ import React, { useEffect } from 'react';
 // import './App.css';
 import styled from 'styled-components';
 
-const testCaseInput = `
-  5 3
-  1 1 E 
-  RFRFRFRF
+const testCaseInput = `5 3
+1 1 E 
+RFRFRFRF
 
-  3 2 N 
-  FRRFLLFFRRFLL
+3 2 N 
+FRRFLLFFRRFLL
 
-  0 3 W 
-  LLFFFLFLFL
+0 3 W 
+LLFFFLFLFL
 `;
 
 function sleep(ms: number) {
@@ -30,6 +29,8 @@ function App() {
   const [currentRobotColor, setCurrentRobotColor] = React.useState<number>(0);
   const [output, setOutput] = React.useState<any[]>([]);
   const [delay, setDelay] = React.useState(DEFAULT_DELAY_MS);
+  const [textAreaValue, setTextAreaValue] = React.useState(testCaseInput);
+  const [didZoomeOut, setDidZoomOut] = React.useState<boolean>(true);
 
   // The first thing we need to do is parse the input to generate a grid and a list of robots
   useEffect(() => {
@@ -69,12 +70,10 @@ function App() {
       type RotationTypes = { [key: string]: number };
       const rotationMap: RotationTypes = { N: 0, E: 90, S: 180, W: 270 };
       await setOutput([]);
-      console.log(robots);
-      console.log('START');
+      await setDidZoomOut(false);
       for (let { startAt, commands } of robots) {
         await setCurrentRobot([]);
         await setCurrentRobotColor(Math.floor(Math.random() * 360));
-        console.log({ startAt });
         const [xStr, yStr, r] = startAt as any;
         let x = +xStr;
         let y = +yStr;
@@ -101,7 +100,6 @@ function App() {
             if (willFail) {
               if (hasScent) continue;
               wasLost = true;
-              console.log('LOST');
               await setGrid((grid: any) => {
                 const tempGrid = [...grid];
                 tempGrid[x][y].scent = true;
@@ -118,7 +116,6 @@ function App() {
               currentRobotPosition,
             ]);
           }
-          console.log({ command, x, y, rotation });
         }
         const finalRotation = Object.keys(rotationMap).find(
           (key) => rotationMap[key] === rotation
@@ -134,14 +131,12 @@ function App() {
           outputStr: robotFinalString,
         };
         await sleep(delay);
-        console.log(finalRobotPosition);
         await setOutput((output) => [...output, finalRobotPosition]);
         await setCurrentRobot([]);
       }
       await setInput(undefined);
       setIsProcessing(false);
-      // await setGrid([]);
-      // await setRobots([]);
+      setTimeout(() => setDidZoomOut(true), DEFAULT_ZOOM_MS + 1000);
     };
     if (grid && robots.length && !isProcessing)
       setTimeout(() => processInstructions(), DEFAULT_ZOOM_MS);
@@ -213,28 +208,75 @@ function App() {
           </Grid>
         </GridWrapper>
       </MarsWrapper>
-      <button
-        onClick={async () => {
-          await setRobots([]);
-          await setGrid([]);
-          await setOutput([]);
-          await setInput(testCaseInput);
-        }}
-      >
-        Input
-      </button>
-      {output.length && (
-        <div style={{ color: '#fff' }}>
-          {output.map(({ outputStr }) => (
-            <div>
-              <code>{outputStr}</code>
+      <ButtonsWrapper>
+        <div>
+          {output.length > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ color: '#fff' }}>
+                {output.map(({ outputStr }) => (
+                  <div>
+                    <code>{outputStr}</code>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
+          )}
+          {!input && (
+            <>
+              <div>
+                {!output.length && (
+                  <textarea
+                    style={{
+                      opacity: 0.7,
+                      marginTop: 28,
+                      height: 200,
+                      padding: 4,
+                      borderRadius: 8,
+                    }}
+                    value={textAreaValue}
+                    onChange={(e) => setTextAreaValue(e.target.value)}
+                  />
+                )}
+              </div>
+              <div
+                style={{
+                  textAlign: 'center',
+                  overflow: 'hidden',
+                  maxHeight: didZoomeOut ? 100 : 0,
+                  transition: 'all 0.5s ease-in-out',
+                }}
+              >
+                <button
+                  style={{ padding: '4px 8px' }}
+                  onClick={async () => {
+                    await setRobots([]);
+                    await setGrid([]);
+                    await setOutput([]);
+                    !output?.length && (await setInput(textAreaValue));
+                  }}
+                >
+                  🔌 {!output?.length ? 'Send message' : 'Send another'}
+                </button>
+              </div>
+            </>
+          )}
         </div>
-      )}
+      </ButtonsWrapper>
     </SpaceWrapper>
   );
 }
+
+const ButtonsWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  z-index: 200;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+`;
 
 const GridWrapper = styled.div`
   position: fixed;
