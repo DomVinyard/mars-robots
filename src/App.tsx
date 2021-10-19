@@ -177,6 +177,7 @@ function App() {
           justifyContent: 'center',
           alignItems: 'center',
           color: '#fff',
+          height: '100vh',
         }}
       >
         <code>Ground control: establishing connection...</code>
