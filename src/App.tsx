@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 // import './App.css';
 import styled from 'styled-components';
+import mars from '/mars.png';
+import useImage from 'react-use-image';
 
 const testCaseInput = `5 3
 1 1 E 
@@ -21,6 +23,7 @@ const DEFAULT_DELAY_MS = 150;
 const DEFAULT_ZOOM_MS = 2200;
 
 function App() {
+  const [loading, setLoading] = React.useState(true);
   const [input, setInput] = React.useState<string>();
   const [grid, setGrid] = React.useState<any>([]) as any;
   const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
@@ -31,10 +34,11 @@ function App() {
   const [delay] = React.useState(DEFAULT_DELAY_MS);
   const [textAreaValue, setTextAreaValue] = React.useState(testCaseInput);
   const [didZoomeOut, setDidZoomOut] = React.useState<boolean>(true);
+  const { loaded } = useImage('/mars.png');
 
   // The first thing we need to do is parse the input to generate a grid and a list of robots
   useEffect(() => {
-    if (!input) return;
+    if (!input || !loaded) return;
     const [rawGridBounds, ...rawInstructions] = `${input}`
       .split('\n')
       .filter(Boolean)
@@ -61,12 +65,13 @@ function App() {
         }
       }, [])
     );
-  }, [input]);
+  }, [input, loaded]);
 
   // If the input is valid, we can start processing
   useEffect(() => {
     const processInstructions = async () => {
       setIsProcessing(true);
+      console.log({ process });
       type RotationTypes = { [key: string]: number };
       const rotationMap: RotationTypes = { N: 0, E: 90, S: 180, W: 270 };
       await setOutput([]);
@@ -136,11 +141,16 @@ function App() {
         await setCurrentRobot([]);
       }
       await setInput(undefined);
-      setIsProcessing(false);
-      setTimeout(() => setDidZoomOut(true), DEFAULT_ZOOM_MS + 1000);
+      setTimeout(async () => {
+        await setDidZoomOut(true);
+        await setIsProcessing(false);
+      }, DEFAULT_ZOOM_MS + 1000);
     };
-    if (grid && robots.length && !isProcessing)
-      setTimeout(() => processInstructions(), DEFAULT_ZOOM_MS);
+    console.log('triggered');
+    setTimeout(() => {
+      if (grid.length && robots.length && !isProcessing && input)
+        processInstructions();
+    }, DEFAULT_ZOOM_MS);
   }, [grid, robots, delay, setIsProcessing, isProcessing]);
 
   //   const expectedOutput = `
@@ -162,6 +172,20 @@ function App() {
   const unitPx = xAxisPx / grid.length;
 
   const currentRobotPosition = currentRobot[currentRobot.length - 1];
+
+  if (!loaded) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <code>Loading...</code>
+      </div>
+    );
+  }
 
   return (
     <SpaceWrapper>
@@ -291,6 +315,7 @@ const GridWrapper = styled.div`
 const Grid = styled.div`
   background-color: #ce8850;
   transition: all ${DEFAULT_ZOOM_MS / 1000}s ease;
+  overflow: hidden;
 `;
 
 const Column = styled.div`
