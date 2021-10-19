@@ -213,19 +213,30 @@ function App() {
                         className="row"
                       >
                         {currentRobotPosition && (
-                          <img
-                            alt="robot"
+                          <div
                             style={{
                               opacity:
                                 currentRobotPosition.x === row.x &&
                                 currentRobotPosition.y === row.y
                                   ? 1
                                   : 0,
-                              width: unitPx * 0.66,
-                              filter: `hue-rotate(${currentRobotColor}deg)`,
                             }}
-                            src={`/robot-${currentRobotPosition.rotation}.png`}
-                          />
+                          >
+                            {[0, 90, 180, 270].map((direction) => (
+                              <img
+                                alt="robot"
+                                style={{
+                                  overflow: 'hidden',
+                                  width:
+                                    currentRobotPosition.rotation === direction
+                                      ? unitPx * 0.66
+                                      : 0,
+                                  filter: `hue-rotate(${currentRobotColor}deg)`,
+                                }}
+                                src={`/robot-${currentRobotPosition.rotation}.png`}
+                              />
+                            ))}
+                          </div>
                         )}
                       </Row>
                     );
