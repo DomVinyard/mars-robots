@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-// import './App.css';
 import styled from 'styled-components';
 import useImage from 'react-use-image';
 
