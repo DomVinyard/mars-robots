@@ -134,7 +134,7 @@ function App() {
           wasLost,
           outputStr: robotFinalString,
         };
-        await sleep(delay);
+        await sleep(delay * 3);
         await setOutput((output) => [...output, finalRobotPosition]);
         await setCurrentRobot([]);
       }
