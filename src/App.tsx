@@ -211,17 +211,19 @@ function App() {
                         }}
                         className="row"
                       >
-                        {currentRobotPosition?.x === row.x &&
-                          currentRobotPosition?.y === row.y && (
-                            <img
-                              alt="robot"
-                              style={{
-                                width: unitPx * 0.66,
-                                filter: `hue-rotate(${currentRobotColor}deg)`,
-                              }}
-                              src={`/robot-${currentRobotPosition.rotation}.png`}
-                            />
-                          )}
+                        <img
+                          alt="robot"
+                          style={{
+                            opacity:
+                              currentRobotPosition?.x === row.x &&
+                              currentRobotPosition?.y === row.y
+                                ? 1
+                                : 0,
+                            width: unitPx * 0.66,
+                            filter: `hue-rotate(${currentRobotColor}deg)`,
+                          }}
+                          src={`/robot-${currentRobotPosition?.rotation}.png`}
+                        />
                       </Row>
                     );
                   })}
