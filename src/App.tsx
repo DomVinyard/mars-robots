@@ -223,18 +223,28 @@ function App() {
                             }}
                           >
                             {[0, 90, 180, 270].map((direction) => (
-                              <img
-                                alt="robot"
+                              <div
                                 style={{
                                   overflow: 'hidden',
-                                  width:
+                                  height:
                                     currentRobotPosition.rotation === direction
-                                      ? unitPx * 0.66
+                                      ? 'auto'
                                       : 0,
-                                  filter: `hue-rotate(${currentRobotColor}deg)`,
+                                  opacity:
+                                    currentRobotPosition.rotation === direction
+                                      ? 1
+                                      : 0,
                                 }}
-                                src={`/robot-${currentRobotPosition.rotation}.png`}
-                              />
+                              >
+                                <img
+                                  alt="robot"
+                                  style={{
+                                    width: unitPx * 0.6,
+                                    filter: `hue-rotate(${currentRobotColor}deg)`,
+                                  }}
+                                  src={`/robot-${currentRobotPosition.rotation}.png`}
+                                />
+                              </div>
                             ))}
                           </div>
                         )}
