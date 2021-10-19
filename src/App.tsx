@@ -177,9 +177,10 @@ function App() {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          color: '#fff',
         }}
       >
-        <code>Loading...</code>
+        <code>Ground control: establishing connection...</code>
       </div>
     );
   }
