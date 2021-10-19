@@ -74,7 +74,11 @@ function App() {
       await setOutput([]);
       await setDidZoomOut(false);
       for (let { startAt, commands } of robots) {
-        await setCurrentRobot([]);
+        await setCurrentRobot([
+          startAt[0],
+          startAt[1],
+          rotationMap[startAt[2]],
+        ]);
         await setCurrentRobotColor(Math.floor(Math.random() * 360));
         const [xStr, yStr, r] = startAt as any;
         let x = +xStr;
