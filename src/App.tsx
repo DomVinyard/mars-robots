@@ -17,7 +17,7 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const DEFAULT_DELAY_MS = 200;
+const DEFAULT_DELAY_MS = 250;
 const DEFAULT_ZOOM_MS = 2200;
 
 function App() {
