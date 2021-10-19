@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 // import './App.css';
 import styled from 'styled-components';
-import mars from '/mars.png';
 import useImage from 'react-use-image';
 
 const testCaseInput = `5 3
@@ -23,7 +22,6 @@ const DEFAULT_DELAY_MS = 150;
 const DEFAULT_ZOOM_MS = 2200;
 
 function App() {
-  const [loading, setLoading] = React.useState(true);
   const [input, setInput] = React.useState<string>();
   const [grid, setGrid] = React.useState<any>([]) as any;
   const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
@@ -146,12 +144,11 @@ function App() {
         await setIsProcessing(false);
       }, DEFAULT_ZOOM_MS + 1000);
     };
-    console.log('triggered');
     setTimeout(() => {
       if (grid.length && robots.length && !isProcessing && input)
         processInstructions();
     }, DEFAULT_ZOOM_MS);
-  }, [grid, robots, delay, setIsProcessing, isProcessing]);
+  }, [grid, robots, delay, setIsProcessing, isProcessing, input]);
 
   //   const expectedOutput = `
   //   1 1 E
