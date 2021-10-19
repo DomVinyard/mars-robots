@@ -278,7 +278,7 @@ function App() {
                     !output?.length && (await setInput(textAreaValue));
                   }}
                 >
-                  🔌 {!output?.length ? 'Send message' : 'Send another'}
+                  🔌 {!output?.length ? 'Send' : 'New message'}
                 </button>
               </div>
             </>
