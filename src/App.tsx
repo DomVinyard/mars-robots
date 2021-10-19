@@ -134,7 +134,7 @@ function App() {
           wasLost,
           outputStr: robotFinalString,
         };
-        await sleep(delay * 3);
+        await sleep(delay * 4);
         await setOutput((output) => [...output, finalRobotPosition]);
         await setCurrentRobot([]);
       }
@@ -304,7 +304,7 @@ function App() {
                     !output?.length && (await setInput(textAreaValue));
                   }}
                 >
-                  🔌 {!output?.length ? 'Send' : 'New message'}
+                  🔌 {!output?.length ? 'Send' : 'Reconnect'}
                 </button>
               </div>
             </>
@@ -337,7 +337,7 @@ const GridWrapper = styled.div`
 `;
 
 const Grid = styled.div`
-  background-color: #ce8850;
+  background-color: #ce8950d3;
   transition: all ${DEFAULT_ZOOM_MS / 1000}s ease;
   overflow: hidden;
 `;
@@ -385,7 +385,7 @@ const Row = styled.div`
   background-position: center;
   background-repeat: no-repeat;
   &:nth-child(even) {
-    background-color: #ce8850;
+    background-color: #ce8950d3;
   }
 `;
 
