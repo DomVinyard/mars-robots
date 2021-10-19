@@ -68,16 +68,13 @@ function App() {
   useEffect(() => {
     const processInstructions = async () => {
       setIsProcessing(true);
-      console.log({ process });
       type RotationTypes = { [key: string]: number };
       const rotationMap: RotationTypes = { N: 0, E: 90, S: 180, W: 270 };
       await setOutput([]);
       await setDidZoomOut(false);
       for (let { startAt, commands } of robots) {
         await setCurrentRobot([
-          startAt[0],
-          startAt[1],
-          rotationMap[startAt[2]],
+          { x: +startAt[0], y: +startAt[1], rotation: rotationMap[startAt[2]] },
         ]);
         await setCurrentRobotColor(Math.floor(Math.random() * 360));
         const [xStr, yStr, r] = startAt as any;
