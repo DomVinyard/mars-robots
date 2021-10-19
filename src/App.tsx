@@ -28,7 +28,7 @@ function App() {
   const [currentRobot, setCurrentRobot] = React.useState<any[]>([]);
   const [currentRobotColor, setCurrentRobotColor] = React.useState<number>(0);
   const [output, setOutput] = React.useState<any[]>([]);
-  const [delay, setDelay] = React.useState(DEFAULT_DELAY_MS);
+  const [delay] = React.useState(DEFAULT_DELAY_MS);
   const [textAreaValue, setTextAreaValue] = React.useState(testCaseInput);
   const [didZoomeOut, setDidZoomOut] = React.useState<boolean>(true);
 
@@ -100,6 +100,7 @@ function App() {
             if (willFail) {
               if (hasScent) continue;
               wasLost = true;
+              // eslint-disable-next-line no-loop-func
               await setGrid((grid: any) => {
                 const tempGrid = [...grid];
                 tempGrid[x][y].scent = true;
@@ -140,7 +141,7 @@ function App() {
     };
     if (grid && robots.length && !isProcessing)
       setTimeout(() => processInstructions(), DEFAULT_ZOOM_MS);
-  }, [grid, robots]);
+  }, [grid, robots, delay, setIsProcessing, isProcessing]);
 
   //   const expectedOutput = `
   //   1 1 E
