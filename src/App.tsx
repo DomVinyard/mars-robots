@@ -17,7 +17,7 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const DEFAULT_DELAY_MS = 300;
+const DEFAULT_DELAY_MS = 200;
 const DEFAULT_ZOOM_MS = 2200;
 
 function App() {
@@ -113,13 +113,13 @@ function App() {
             }
             x = targetX;
             y = targetY;
-            await sleep(delay);
-            const currentRobotPosition = { x, y, rotation };
-            await setCurrentRobot((currentRobot) => [
-              ...currentRobot,
-              currentRobotPosition,
-            ]);
           }
+          await sleep(delay);
+          const currentRobotPosition = { x, y, rotation };
+          await setCurrentRobot((currentRobot) => [
+            ...currentRobot,
+            currentRobotPosition,
+          ]);
         }
         const finalRotation = Object.keys(rotationMap).find(
           (key) => rotationMap[key] === rotation
