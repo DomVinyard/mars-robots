@@ -17,36 +17,40 @@ function App() {
 
   // The markup is just the simulation and the UI/Buttons
   return (
-    <SpaceWrapper data-testid={`${isProcessing ? 'is' : 'not'}-processing`}>
+    <>
+      <SpaceWrapper data-testid={`${isProcessing ? 'is' : 'not'}-processing`}>
+        <MarsWrapper
+          style={{ transform: `scale(${zoom === 'in' ? 1 : 0.05})` }}
+        >
+          {processed && zoom !== 'out' && (
+            <Simulation
+              data={processed}
+              setOutput={setDisplayOutput}
+              onEnd={() => {
+                setZoom('transition-out');
+                setTimeout(() => setZoom('out'), DEFAULT_ZOOM_MS + 1000);
+              }}
+            />
+          )}
+        </MarsWrapper>
+        <ButtonsAndUI
+          input={input}
+          output={displayOutput}
+          zoom={zoom}
+          onClick={async (commands: string) => {
+            if (processed) {
+              reset();
+              setDisplayOutput([]);
+              setInput(undefined);
+            } else {
+              setZoom('in');
+              await setInput(commands);
+            }
+          }}
+        />
+      </SpaceWrapper>
       <GithubCorner href={GITHUB_URL} bannerColor="#279BCC" />
-      <MarsWrapper style={{ transform: `scale(${zoom === 'in' ? 1 : 0.05})` }}>
-        {processed && zoom !== 'out' && (
-          <Simulation
-            data={processed}
-            setOutput={setDisplayOutput}
-            onEnd={() => {
-              setZoom('transition-out');
-              setTimeout(() => setZoom('out'), DEFAULT_ZOOM_MS + 1000);
-            }}
-          />
-        )}
-      </MarsWrapper>
-      <ButtonsAndUI
-        input={input}
-        output={displayOutput}
-        zoom={zoom}
-        onClick={async (commands: string) => {
-          if (processed) {
-            reset();
-            setDisplayOutput([]);
-            setInput(undefined);
-          } else {
-            setZoom('in');
-            await setInput(commands);
-          }
-        }}
-      />
-    </SpaceWrapper>
+    </>
   );
 }
 

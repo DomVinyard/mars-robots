@@ -75,7 +75,7 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
-  z-index: 200;
+  /* z-index: 200; */
   position: fixed;
   top: 0;
   left: 0;
