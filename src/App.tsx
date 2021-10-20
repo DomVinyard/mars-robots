@@ -8,9 +8,35 @@ import Simulation from './components/Simulation';
 import { DEFAULT_ZOOM_MS, GITHUB_URL } from './config';
 import useProcessInput from './hooks/useProcessInput';
 
-type ProcessedInput = {
+// Types for the processed output
+// (This drives the simulation)
+type GridPoint = {
+  x: number;
+  y: number;
+  scent: number | boolean;
+};
+
+type RobotLocation = {
+  x: number;
+  y: number;
+  rotation: number;
+};
+
+type Robot = {
+  locations: RobotLocation[];
+  rotation: number;
+  lost: boolean;
+};
+
+type Processed = {
+  grid: GridPoint[][];
+  robots: Robot[];
+  output: string;
+};
+
+type ProcessedObject = {
   isProcessing: boolean;
-  processed: any;
+  processed: Processed;
   reset: () => void;
 };
 
@@ -21,7 +47,7 @@ function App() {
   const [displayOutput, setDisplayOutput] = useState<any>([]);
   const { isProcessing, processed, reset } = useProcessInput(
     input
-  ) as ProcessedInput;
+  ) as ProcessedObject;
 
   // The markup is just the simulation and the UI/Buttons
   return (

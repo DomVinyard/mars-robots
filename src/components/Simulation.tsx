@@ -76,7 +76,7 @@ function Simulation({ data, setOutput, onEnd, zoom }: any) {
                                 width: unitPx * 0.6,
                                 filter: currentRobot?.color,
                               }}
-                              src={`/robot-${rotation}.png`}
+                              src={`/robot-${rotation || 0}.png`}
                             />
                           </div>
                         ))}
