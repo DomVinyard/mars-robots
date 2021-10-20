@@ -8,7 +8,7 @@ As per the brief, the "focus is on the front-end design and implementation".
 
 This is the best place to start. I spend a a few minutes chatting casually about the code and my solution.
 
-👉👉👉 [Code Walkthrough (4:42)](https://www.loom.com/share/14eff73338ae49f6a9f6fefd801c7334)
+👉👉👉 [Code Walkthrough (6:23)](https://www.loom.com/share/6188834f8b8d40e99c0f3721efd4f07f)
 
 ## 🕹 Demo
 
