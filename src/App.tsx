@@ -11,29 +11,40 @@ import useProcessInput from './hooks/useProcessInput';
 function App() {
   // When the input is set, parse it and return the grid and robot list
   const [input, setInput] = useState<string>();
-  const { isProcessing, processed, reset } = useProcessInput(input) as any;
   const [zoom, setZoom] = useState<string>('out');
+  const [displayOutput, setDisplayOutput] = useState<any>([]);
+  const { isProcessing, processed, reset } = useProcessInput(input) as any;
 
   // The markup is just the simulation and the UI/Buttons
   return (
     <SpaceWrapper data-testid={`${isProcessing ? 'is' : 'not'}-processing`}>
       <GithubCorner href={GITHUB_URL} bannerColor="#279BCC" />
-      <MarsWrapper style={{ transform: `scale(${input ? 1 : 0.05})` }}>
-        {processed && (
+      <MarsWrapper style={{ transform: `scale(${zoom === 'in' ? 1 : 0.05})` }}>
+        {processed && zoom !== 'out' && (
           <Simulation
             data={processed}
-            onStart={() => setZoom('in')}
-            onEnd={() => setZoom('out')}
+            setOutput={setDisplayOutput}
+            onEnd={() => {
+              setZoom('transition-out');
+              setTimeout(() => setZoom('out'), DEFAULT_ZOOM_MS + 1000);
+            }}
           />
         )}
       </MarsWrapper>
       <ButtonsAndUI
         input={input}
-        output={processed.output}
+        output={displayOutput}
         zoom={zoom}
-        onClick={async (commands: string) =>
-          processed ? reset() : await setInput(commands)
-        }
+        onClick={async (commands: string) => {
+          if (processed) {
+            reset();
+            setDisplayOutput([]);
+            setInput(undefined);
+          } else {
+            setZoom('in');
+            await setInput(commands);
+          }
+        }}
       />
     </SpaceWrapper>
   );

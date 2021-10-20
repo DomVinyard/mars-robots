@@ -2,7 +2,6 @@ import { Handler } from '@netlify/functions';
 import { rotationMap } from '../utils';
 
 const handler: Handler = async (event) => {
-  console.log('process input');
   try {
     const input = event?.body as string;
     if (!input) throw new Error('No input provided');
@@ -37,12 +36,9 @@ const handler: Handler = async (event) => {
       []
     );
     let robots = [];
-    let robot_iteration = 0;
-    let move_iteration = 0;
+    let iteration = 0;
     // Calculate steps
     for (let { startAt, commands } of processedInstructions) {
-      move_iteration = 0;
-      robot_iteration++;
       let robot = {
         color: `hue-rotate(${Math.floor(Math.random() * 360)}deg)`,
         locations: [
@@ -55,7 +51,7 @@ const handler: Handler = async (event) => {
       let rotation = rotationMap[r];
       let wasLost = false;
       for (let command of commands) {
-        move_iteration++;
+        iteration++;
         const hasScent = grid[x][y]?.scent;
         if (command === 'L') rotation -= 90;
         if (command === 'R') rotation += 90;
@@ -76,7 +72,7 @@ const handler: Handler = async (event) => {
           if (willFail) {
             if (hasScent) continue;
             wasLost = true;
-            grid[x][y].scent = [robot_iteration, move_iteration];
+            grid[x][y].scent = iteration;
             break;
           }
           x = targetX;
@@ -88,9 +84,6 @@ const handler: Handler = async (event) => {
       const endRotation = Object.keys(rotationMap).find(
         (key) => rotationMap[key] === rotation
       );
-
-      // Finished processing robot
-      robot_iteration++;
       const robotOutput = `${x} ${y} ${endRotation}${wasLost ? ' LOST' : ''}`;
       robots.push({ ...robot, lost: wasLost, output: robotOutput });
     }

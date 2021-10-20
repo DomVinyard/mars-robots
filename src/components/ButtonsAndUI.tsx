@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-const testCaseInput = `5 3
+const exampleInput = `5 3
 1 1 E 
 RFRFRFRF
 
@@ -12,24 +12,24 @@ FRRFLLFFRRFLL
 LLFFFLFLFL
 `;
 
-function ButtonsAndUI({ input, output, didZoomOut, onClick }: any) {
-  const [textAreaValue, setTextAreaValue] = useState(testCaseInput);
+function ButtonsAndUI({ input, output, zoom, onClick }: any) {
+  const [textAreaValue, setTextAreaValue] = useState(exampleInput);
   return (
     <Wrapper>
       <div>
         {output?.length > 0 && (
           <div style={{ marginBottom: 16 }}>
             <div style={{ color: '#fff' }}>
-              {output.map(({ outputStr, i }: any) => (
+              {output?.map?.((line: any, i: number) => (
                 <div key={i}>
-                  <code>{outputStr}</code>
+                  <code>{line}</code>
                 </div>
               ))}
             </div>
           </div>
         )}
-        {!input && (
-          <>
+        <>
+          {!input && (
             <div>
               {!output?.length && (
                 <TextArea
@@ -38,13 +38,15 @@ function ButtonsAndUI({ input, output, didZoomOut, onClick }: any) {
                 />
               )}
             </div>
-            <Buttons style={{ maxHeight: didZoomOut ? 100 : 0 }}>
+          )}
+          {zoom !== 'in' && (
+            <Buttons style={{ maxHeight: zoom === 'out' ? 100 : 0 }}>
               <Button onClick={() => onClick(textAreaValue)}>
                 🔌 {!output?.length ? 'Send' : 'Reconnect'}
               </Button>
             </Buttons>
-          </>
-        )}
+          )}
+        </>
       </div>
     </Wrapper>
   );

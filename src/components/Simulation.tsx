@@ -1,89 +1,82 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { DEFAULT_ZOOM_MS, MAX_GRID_PX } from '../config';
+import { DEFAULT_ZOOM_MS, MAX_GRID_PX, DEFAULT_DELAY_MS } from '../config';
+import { sleep } from '../utils';
 
-function Grid({ data }: any) {
-  const [grid, setGrid] = useState(data.grid);
-
-  const [currentRobot, setCurrentRobot] = useState<any[]>([]);
-  const [currentRobotColor, setCurrentRobotColor] = useState<number>(0);
+function Simulation({ data, setOutput, onEnd, zoom }: any) {
+  const [currentRobot, setCurrentRobot] = useState<any[]>([]) as any;
+  const [currentLocation, setCurrentLocation] = useState<any[]>([]) as any;
+  const [iteration, setIteration] = useState(0);
+  const [simulating, setSimulating] = useState<boolean>(false);
 
   // Automatically generate a grid based on the number of rows and columns
   // The size of the grid and the sprites will scale relative to the grid size
-  const largestAxis = grid?.length > grid?.[0]?.length ? 'x' : 'y';
-  const gridPxRatio = !grid?.length
-    ? 1
-    : largestAxis === 'y'
-    ? grid?.[0]?.length / grid?.length
-    : grid?.length / grid?.[0]?.length;
+  const x = data.grid.length;
+  const y = data.grid[0].length;
+  const largestAxis = x > y ? 'x' : 'y';
+  const gridPxRatio = largestAxis === 'y' ? y / x : x / y;
   const yAxisPx = largestAxis === 'y' ? MAX_GRID_PX : MAX_GRID_PX / gridPxRatio;
   const xAxisPx = largestAxis === 'x' ? MAX_GRID_PX : MAX_GRID_PX / gridPxRatio;
-  const unitPx = xAxisPx / grid.length;
-
-  // Give every robot a unique color
-  const currentRobotPosition = currentRobot[currentRobot.length - 1];
-  const robotColor = `hue-rotate(${currentRobotColor}deg)`;
+  const unitPx = xAxisPx / x;
 
   useEffect(() => {
     const runSimulation = async () => {
-      for (let { color, locations } of data.robots) {
-        for (let location of locations) {
-          console.log({ location });
+      for (let robot of data.robots) {
+        await setCurrentRobot(robot);
+        for (let location of robot.locations) {
+          setCurrentLocation(location);
+          await sleep(DEFAULT_DELAY_MS);
+          await setIteration((iteration) => iteration + 1);
         }
+        setOutput((output: any[]) => [...output, robot.output]);
+        await sleep(DEFAULT_DELAY_MS * 3);
       }
+      onEnd();
     };
-    setTimeout(() => data ?? runSimulation(), DEFAULT_ZOOM_MS);
-  }, [data]);
+    if (simulating || zoom === 'out') return;
+    setTimeout(runSimulation, DEFAULT_ZOOM_MS);
+    setSimulating(true);
+  }, [data.robots, onEnd, setOutput, simulating, zoom]);
 
   return (
     <Outer>
       <Inner style={{ height: yAxisPx, width: xAxisPx, opacity: data ? 1 : 0 }}>
-        {grid.map((column: any, i: number) => {
+        {data.grid.map((column: any, col_i: number) => {
           return (
-            <Column key={`col_${i}`} style={{ width: unitPx }}>
-              {[...column].reverse().map((row: any) => {
+            <Column key={`col_${col_i}`} style={{ width: unitPx }}>
+              {[...column].reverse().map((row: any, row_i: number) => {
+                const hasFlag = row.scent && row.scent <= iteration;
+                const { x, y, rotation } = currentLocation || {};
                 return (
                   <Row
                     key={`row_${row.x}_${row.y}`}
                     style={{
                       height: unitPx,
                       backgroundSize: unitPx * 0.5,
-                      backgroundImage: row.scent ? 'url(/flag.png)' : 'none',
+                      backgroundImage: hasFlag ? 'url(/flag.png)' : 'none',
                     }}
                     className="row"
                   >
-                    {currentRobotPosition && (
+                    {currentLocation && (
                       <div
-                        style={{
-                          opacity:
-                            currentRobotPosition.x === row.x &&
-                            currentRobotPosition.y === row.y
-                              ? 1
-                              : 0,
-                        }}
+                        style={{ opacity: x === row.x && y === row.y ? 1 : 0 }}
                       >
                         {[0, 90, 180, 270].map((direction) => (
                           <div
                             key={direction}
                             style={{
                               overflow: 'hidden',
-                              height:
-                                currentRobotPosition.rotation === direction
-                                  ? 'auto'
-                                  : 0,
-                              opacity:
-                                currentRobotPosition.rotation === direction
-                                  ? 1
-                                  : 0,
+                              height: rotation === direction ? 'auto' : 0,
+                              opacity: rotation === direction ? 1 : 0,
                             }}
                           >
                             <img
                               alt="robot"
                               style={{
                                 width: unitPx * 0.6,
-                                filter: robotColor,
+                                filter: currentRobot?.color,
                               }}
-                              src={`/robot-${currentRobotPosition.rotation}.png`}
+                              src={`/robot-${rotation}.png`}
                             />
                           </div>
                         ))}
@@ -141,4 +134,4 @@ const Row = styled.div`
   }
 `;
 
-export default Grid;
+export default Simulation;
