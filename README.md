@@ -1,30 +1,18 @@
 # Mars Robots
 
-A coding challenge. I used React on the frontend and Serverless functions on the backend to process robot instructions.
+A coding challenge to process instructions for robots on Mars. It's written in TypeScript and uses React on the front end and Serverless functions on the back end.
 
-As per the brief, the "Focus is on the front-end design and implementation".
+As per the brief, the "focus is on the front-end design and implementation".
 
 ## 📼 Code Walkthrough Video
 
-This is the best place to start. I spend a a few minutes chatting about the code and my solution.
+This is the best place to start. I spend a a few minutes chatting casually about the code and my solution.
 
-[Code Walkthrough (4:42)](https://www.loom.com/share/14eff73338ae49f6a9f6fefd801c7334)
-
-(Note: The animation has a pretty poor framerate, try the demo below and it should be much smoother).
+👉👉👉 [Code Walkthrough (4:42)](https://www.loom.com/share/14eff73338ae49f6a9f6fefd801c7334)
 
 ## 🕹 Demo
 
 Play with the app yourself at [mars-robots.netlify.app](https://mars-robots.netlify.app).
-
-## 👉 Quick Start Guide
-
-```bash
-yarn # install dependencies
-npm install netlify-cli -g # install netlify dev
-yarn dev # Start client and server
-```
-
-Then visit `http://localhost:8888`
 
 ## Codebase Tour
 
@@ -38,10 +26,20 @@ Some parts of the code worth checking out:
 
 These 5 files contain the majority of the complexity.
 
+## ✨ Quick Start Guide
+
+```bash
+yarn # install dependencies
+npm install netlify-cli -g # install netlify dev
+yarn dev # Start client and server
+```
+
+Then visit `http://localhost:8888`
+
 ## Todo
 
 I ended up spending a few hours on this, if I had a few extra hours I would prioritise the following:
 
-- Better typing. Large parts of the codebase are untyped with extensive use of the `any` keyword, these should all be typed properly.
-- Validation, if the input is not in the correct format the app will crash ungracefully.
-- More tests, there are lots of edge cases to handle.
+1. Validation, if the input is not in the correct format the app will crash ungracefully.
+2. Better typing. Large parts of the codebase are untyped with extensive use of the `any` keyword, these should all be typed properly.
+3. More tests, there are lots of edge cases to handle.
