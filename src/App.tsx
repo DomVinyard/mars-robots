@@ -8,12 +8,20 @@ import Simulation from './components/Simulation';
 import { DEFAULT_ZOOM_MS, GITHUB_URL } from './config';
 import useProcessInput from './hooks/useProcessInput';
 
+type ProcessedInput = {
+  isProcessing: boolean;
+  processed: any;
+  reset: () => void;
+};
+
 function App() {
-  // When the input is set, parse it and return the grid and robot list
+  // Process the input on the server and return it using a custom hook
   const [input, setInput] = useState<string>();
   const [zoom, setZoom] = useState<string>('out');
   const [displayOutput, setDisplayOutput] = useState<any>([]);
-  const { isProcessing, processed, reset } = useProcessInput(input) as any;
+  const { isProcessing, processed, reset } = useProcessInput(
+    input
+  ) as ProcessedInput;
 
   // The markup is just the simulation and the UI/Buttons
   return (
