@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 const testCaseInput = `5 3
@@ -13,15 +13,15 @@ LLFFFLFLFL
 `;
 
 function ButtonsAndUI({ input, output, didZoomOut, onClick }: any) {
-  const [textAreaValue, setTextAreaValue] = React.useState(testCaseInput);
+  const [textAreaValue, setTextAreaValue] = useState(testCaseInput);
   return (
     <Wrapper>
       <div>
-        {output.length > 0 && (
+        {output?.length > 0 && (
           <div style={{ marginBottom: 16 }}>
             <div style={{ color: '#fff' }}>
-              {output.map(({ outputStr }: any) => (
-                <div>
+              {output.map(({ outputStr, i }: any) => (
+                <div key={i}>
                   <code>{outputStr}</code>
                 </div>
               ))}
@@ -31,7 +31,7 @@ function ButtonsAndUI({ input, output, didZoomOut, onClick }: any) {
         {!input && (
           <>
             <div>
-              {!output.length && (
+              {!output?.length && (
                 <TextArea
                   value={textAreaValue}
                   onChange={(e) => setTextAreaValue(e.target.value)}

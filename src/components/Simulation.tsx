@@ -1,10 +1,16 @@
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { DEFAULT_ZOOM_MS, MAX_GRID_PX } from '../config';
 
-function App({ input, grid, robots, currentRobot, currentRobotColor }: any) {
+function Grid({ data }: any) {
+  const [grid, setGrid] = useState(data.grid);
+
+  const [currentRobot, setCurrentRobot] = useState<any[]>([]);
+  const [currentRobotColor, setCurrentRobotColor] = useState<number>(0);
+
   // Automatically generate a grid based on the number of rows and columns
   // The size of the grid and the sprites will scale relative to the grid size
-  const largestAxis = grid.length > grid?.[0]?.length ? 'x' : 'y';
+  const largestAxis = grid?.length > grid?.[0]?.length ? 'x' : 'y';
   const gridPxRatio = !grid?.length
     ? 1
     : largestAxis === 'y'
@@ -18,11 +24,20 @@ function App({ input, grid, robots, currentRobot, currentRobotColor }: any) {
   const currentRobotPosition = currentRobot[currentRobot.length - 1];
   const robotColor = `hue-rotate(${currentRobotColor}deg)`;
 
+  useEffect(() => {
+    const runSimulation = async () => {
+      for (let { color, locations } of data.robots) {
+        for (let location of locations) {
+          console.log({ location });
+        }
+      }
+    };
+    setTimeout(() => data ?? runSimulation(), DEFAULT_ZOOM_MS);
+  }, [data]);
+
   return (
-    <GridWrapper
-      data-testid={robots.length > 0 ? 'is-processing' : 'not-processing'}
-    >
-      <Grid style={{ height: yAxisPx, width: xAxisPx, opacity: input ? 1 : 0 }}>
+    <Outer>
+      <Inner style={{ height: yAxisPx, width: xAxisPx, opacity: data ? 1 : 0 }}>
         {grid.map((column: any, i: number) => {
           return (
             <Column key={`col_${i}`} style={{ width: unitPx }}>
@@ -80,12 +95,12 @@ function App({ input, grid, robots, currentRobot, currentRobotColor }: any) {
             </Column>
           );
         })}
-      </Grid>
-    </GridWrapper>
+      </Inner>
+    </Outer>
   );
 }
 
-const GridWrapper = styled.div`
+const Outer = styled.div`
   position: fixed;
   display: flex;
   justify-content: center;
@@ -94,7 +109,7 @@ const GridWrapper = styled.div`
   width: 100%;
 `;
 
-const Grid = styled.div`
+const Inner = styled.div`
   background-color: #ce8950d3;
   transition: all ${DEFAULT_ZOOM_MS / 1000}s ease;
   overflow: hidden;
@@ -126,4 +141,4 @@ const Row = styled.div`
   }
 `;
 
-export default App;
+export default Grid;
