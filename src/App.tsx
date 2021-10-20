@@ -1,24 +1,12 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import useImage from 'react-use-image';
-
-const testCaseInput = `5 3
-1 1 E 
-RFRFRFRF
-
-3 2 N 
-FRRFLLFFRRFLL
-
-0 3 W 
-LLFFFLFLFL
-`;
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-const DEFAULT_DELAY_MS = 200;
-const DEFAULT_ZOOM_MS = 2200;
+import GithubCorner from 'react-github-corner';
+import Loading from './components/Loading';
+import ButtonsAndUI from './components/ButtonsAndUI';
+import Grid from './components/Grid';
+import { DEFAULT_ZOOM_MS, DEFAULT_DELAY_MS, GITHUB_URL } from './config';
+import sleep from './utils/sleep';
 
 function App() {
   const [input, setInput] = React.useState<string>();
@@ -29,11 +17,11 @@ function App() {
   const [currentRobotColor, setCurrentRobotColor] = React.useState<number>(0);
   const [output, setOutput] = React.useState<any[]>([]);
   const [delay] = React.useState(DEFAULT_DELAY_MS);
-  const [textAreaValue, setTextAreaValue] = React.useState(testCaseInput);
-  const [didZoomeOut, setDidZoomOut] = React.useState<boolean>(true);
+  const [didZoomOut, setDidZoomOut] = React.useState<boolean>(true);
   const { loaded } = useImage('/mars.png');
 
   // The first thing we need to do is parse the input to generate a grid and a list of robots
+  // const { grid, robots } = useParseInput(input, [loaded])
   useEffect(() => {
     if (!input || !loaded) return;
     const [rawGridBounds, ...rawInstructions] = `${input}`
@@ -134,8 +122,8 @@ function App() {
           wasLost,
           outputStr: robotFinalString,
         };
-        await sleep(delay * 4);
         await setOutput((output) => [...output, finalRobotPosition]);
+        await sleep(delay * 4);
         await setCurrentRobot([]);
       }
       await setInput(undefined);
@@ -150,211 +138,28 @@ function App() {
     }, DEFAULT_ZOOM_MS);
   }, [grid, robots, delay, setIsProcessing, isProcessing, input]);
 
-  //   const expectedOutput = `
-  //   1 1 E
-  //   3 3 N LOST
-  //   2 3 S
-  // `;
+  // Send the message to the robots
+  const trigger = async (textAreaInput: string) => {
+    await setRobots([]);
+    await setGrid([]);
+    await setOutput([]);
+    !output?.length && (await setInput(textAreaInput));
+  };
 
-  // if (!grid.length) return <div>Loading...</div>;
-
-  const MAX_GRID_PX = 400;
-  const largestAxis = grid.length > grid?.[0]?.length ? 'x' : 'y';
-  const gridPxRatio =
-    largestAxis === 'y'
-      ? grid?.[0]?.length / grid?.length
-      : grid?.length / grid?.[0]?.length;
-  const yAxisPx = largestAxis === 'y' ? MAX_GRID_PX : MAX_GRID_PX / gridPxRatio;
-  const xAxisPx = largestAxis === 'x' ? MAX_GRID_PX : MAX_GRID_PX / gridPxRatio;
-  const unitPx = xAxisPx / grid.length;
-
-  const currentRobotPosition = currentRobot[currentRobot.length - 1];
-
-  if (!loaded) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          color: '#fff',
-          height: '100vh',
-        }}
-      >
-        <code>Ground control: establishing connection...</code>
-      </div>
-    );
-  }
-
+  if (!loaded) return <Loading />;
   return (
-    <SpaceWrapper>
-      <MarsWrapper
-        style={{
-          transform: `scale(${input ? 1 : 0.05})`,
-        }}
-      >
-        <GridWrapper>
-          <Grid
-            style={{ height: yAxisPx, width: xAxisPx, opacity: input ? 1 : 0 }}
-          >
-            {grid.map((column: any) => {
-              return (
-                <Column style={{ width: unitPx }}>
-                  {[...column].reverse().map((row: any) => {
-                    return (
-                      <Row
-                        style={{
-                          height: unitPx,
-                          backgroundSize: unitPx * 0.5,
-                          backgroundImage: row.scent
-                            ? 'url(/flag.png)'
-                            : 'none',
-                        }}
-                        className="row"
-                      >
-                        {currentRobotPosition && (
-                          <div
-                            style={{
-                              opacity:
-                                currentRobotPosition.x === row.x &&
-                                currentRobotPosition.y === row.y
-                                  ? 1
-                                  : 0,
-                            }}
-                          >
-                            {[0, 90, 180, 270].map((direction) => (
-                              <div
-                                style={{
-                                  overflow: 'hidden',
-                                  height:
-                                    currentRobotPosition.rotation === direction
-                                      ? 'auto'
-                                      : 0,
-                                  opacity:
-                                    currentRobotPosition.rotation === direction
-                                      ? 1
-                                      : 0,
-                                }}
-                              >
-                                <img
-                                  alt="robot"
-                                  style={{
-                                    width: unitPx * 0.6,
-                                    filter: `hue-rotate(${currentRobotColor}deg)`,
-                                  }}
-                                  src={`/robot-${currentRobotPosition.rotation}.png`}
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </Row>
-                    );
-                  })}
-                </Column>
-              );
-            })}
-          </Grid>
-        </GridWrapper>
+    <SpaceWrapper data-testid="app">
+      <GithubCorner href={GITHUB_URL} bannerColor="#279BCC" />
+      <MarsWrapper style={{ transform: `scale(${input ? 1 : 0.05})` }}>
+        <Grid {...{ input, grid, robots, currentRobot, currentRobotColor }} />
       </MarsWrapper>
-      <ButtonsWrapper>
-        <div>
-          {output.length > 0 && (
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ color: '#fff' }}>
-                {output.map(({ outputStr }) => (
-                  <div>
-                    <code>{outputStr}</code>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {!input && (
-            <>
-              <div>
-                {!output.length && (
-                  <textarea
-                    style={{
-                      opacity: 0.7,
-                      marginTop: 28,
-                      height: 200,
-                      padding: 4,
-                      borderRadius: 8,
-                    }}
-                    value={textAreaValue}
-                    onChange={(e) => setTextAreaValue(e.target.value)}
-                  />
-                )}
-              </div>
-              <div
-                style={{
-                  textAlign: 'center',
-                  overflow: 'hidden',
-                  maxHeight: didZoomeOut ? 100 : 0,
-                  transition: 'all 0.5s ease-in-out',
-                }}
-              >
-                <button
-                  style={{ padding: '4px 8px' }}
-                  onClick={async () => {
-                    await setRobots([]);
-                    await setGrid([]);
-                    await setOutput([]);
-                    !output?.length && (await setInput(textAreaValue));
-                  }}
-                >
-                  🔌 {!output?.length ? 'Send' : 'Reconnect'}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </ButtonsWrapper>
+      <ButtonsAndUI {...{ input, output, didZoomOut }} onClick={trigger} />
     </SpaceWrapper>
   );
 }
 
-const ButtonsWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  z-index: 200;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-`;
-
-const GridWrapper = styled.div`
-  position: fixed;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-`;
-
-const Grid = styled.div`
-  background-color: #ce8950d3;
-  transition: all ${DEFAULT_ZOOM_MS / 1000}s ease;
-  overflow: hidden;
-`;
-
-const Column = styled.div`
-  float: left;
-  width: 20px; /* 5 columns: 100% ÷ 5 = 20% */
-  height: 100%;
-  top: 0;
-  bottom: 0;
-  overflow: hidden;
-  &:nth-child(odd) {
-    background-color: #b57044;
-  }
-  &:nth-child(even) .row:nth-child(even) {
-    background-color: #b57044;
-  }
+const SpaceWrapper = styled.div`
+  background-color: #000;
 `;
 
 const MarsWrapper = styled.div`
@@ -370,23 +175,6 @@ const MarsWrapper = styled.div`
   left: 50%;
   margin-left: -3000px;
   margin-top: -3000px;
-`;
-
-const SpaceWrapper = styled.div`
-  background-color: #000;
-`;
-
-const Row = styled.div`
-  width: 100%;
-  height: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-position: center;
-  background-repeat: no-repeat;
-  &:nth-child(even) {
-    background-color: #ce8950d3;
-  }
 `;
 
 export default App;
